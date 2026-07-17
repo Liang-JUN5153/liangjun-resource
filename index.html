@@ -1115,7 +1115,7 @@
 
     <script>
         // ==================== GitHub Gist 配置 ====================
-        const GIST_URL = 'https://gist.githubusercontent.com/Liang-JUN5153/ba041979d138a7f7f79d605576b90810/raw/resources.json?t=' + Date.now();
+        const GIST_URL = 'https://gist.githubusercontent.com/Liang-JUN5153/ba041979d138a7f7f79d605576b90810/raw/5a33cb3340c4208e39483e018ee0e5391ab4fab9/gistfile1.txt';
 
         let resourcesData = {};
 
@@ -1123,7 +1123,7 @@
         const backupData = {
             "cyberpunk2077": {
                 "title": "赛博朋克2077",
-                "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/3bd292808ba9d8a337c5278acb8345d94ed769a3/header_tchinese.jpg?t=1769690377",
+                "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/header.jpg",
                 "emoji": "🤖",
                 "desc": "开放世界科幻RPG，支持光追",
                 "size": "70GB+",
@@ -1135,6 +1135,7 @@
             },
             "stellarblade": {
                 "title": "剑星",
+                "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3489700/header.jpg",
                 "emoji": "⚔️",
                 "desc": "韩式动作游戏，华丽战斗系统",
                 "size": "50GB+",
@@ -1219,12 +1220,12 @@
             container.innerHTML = keys.map(key => {
                 const item = resourcesData[key];
                 const cover = item.cover || '';
-                const bgStyle = cover ? `background-image: url('${cover}'); background-size: cover; background-position: center;` : '';
+                const hasCover = cover && cover.length > 0;
 
                 return `
                     <div class="showcase-card" onclick="openResourceMulti('${item.title}', '${key}')">
-                        <div class="showcase-card-img" style="${bgStyle}">
-                            ${!cover ? `<span class="emoji">${item.emoji}</span>` : ''}
+                        <div class="showcase-card-img" data-cover="${cover}" data-emoji="${item.emoji}">
+                            ${!hasCover ? `<span class="emoji">${item.emoji}</span>` : ''}
                             <div class="card-overlay">
                                 <div class="card-title">${item.title}</div>
                                 <div class="card-meta">
@@ -1236,6 +1237,24 @@
                     </div>
                 `;
             }).join('');
+
+            // 图片加载完成后设置背景，失败则显示emoji
+            container.querySelectorAll('.showcase-card-img').forEach(el => {
+                const cover = el.dataset.cover;
+                const emoji = el.dataset.emoji;
+                if (cover) {
+                    const img = new Image();
+                    img.onload = () => {
+                        el.style.backgroundImage = `url('${cover}')`;
+                        el.style.backgroundSize = 'cover';
+                        el.style.backgroundPosition = 'center';
+                    };
+                    img.onerror = () => {
+                        el.innerHTML = `<span class="emoji">${emoji}</span>` + el.innerHTML;
+                    };
+                    img.src = cover;
+                }
+            });
         }
 
         // 初始化横向滚动区2（横版卡片）

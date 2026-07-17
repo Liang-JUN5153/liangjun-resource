@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>良君资源站 - 资源搜索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1890ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #1890ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #1890ff;
+        }
+
+        /* 搜索区域 */
+        .search-section {
+            background: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .search-subtitle {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            border: 2px solid #1890ff;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(24,144,255,0.15);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 16px 20px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #bbb;
+        }
+
+        .search-btn {
+            background: #1890ff;
+            color: #fff;
+            border: none;
+            padding: 0 32px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover {
+            background: #40a9ff;
+        }
+
+        /* 线路选择 */
+        .line-section {
+            max-width: 700px;
+            margin: 20px auto 0;
+            text-align: left;
+        }
+
+        .line-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .line-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .line-tag {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .line-tag:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .line-tag.active {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+
+        /* 加载状态 */
+        .loading-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-section .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f0f0f0;
+            border-top-color: #1890ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-section p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== 横向滚动展示区域 ========== */
+        .scroll-showcase {
+            background: #fff;
+            padding: 30px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .scroll-showcase-header {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .scroll-showcase-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scroll-showcase-title .icon {
+            font-size: 24px;
+        }
+
+        .scroll-showcase-subtitle {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .scroll-showcase-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .scroll-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .scroll-nav-btn:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+
+        .scroll-container-wrapper {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .scroll-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 4px 4px 16px 4px;
+            scrollbar-width: thin;
+            scrollbar-color: #d0d0d0 transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #d0d0d0;
+            border-radius: 3px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #b0b0b0;
+        }
+
+        .showcase-card {
+            flex-shrink: 0;
+            width: 200px;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .showcase-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+        }
+
+        .showcase-card-img {
+            width: 100%;
+            height: 260px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .showcase-card-img::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.9;
+        }
+
+        .showcase-card-img .emoji {
+            position: relative;
+            z-index: 1;
+            font-size: 64px;
+        }
+
+        .showcase-card-img .quality-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff4d4f;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            z-index: 2;
+        }
+
+        .showcase-card-info {
+            padding: 14px;
+        }
+
+        .showcase-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 6px;
+        }
+
+        .showcase-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .showcase-card-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag-game {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        /* 第二个横向滚动区 */
+        .scroll-showcase-alt {
+            background: #f8f9fa;
+            padding: 30px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .scroll-showcase-alt .showcase-card {
+            width: 280px;
+            display: flex;
+            flex-direction: row;
+            height: 120px;
+        }
+
+        .scroll-showcase-alt .showcase-card-img {
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .scroll-showcase-alt .showcase-card-img::before {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .scroll-showcase-alt .showcase-card-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .scroll-showcase-alt .showcase-card-title {
+            white-space: normal;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
+        }
+
+        .scroll-showcase-alt .showcase-card-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 热搜区域 */
+        .hot-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .hot-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .hot-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .hot-badge {
+            background: #ff4d4f;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .hot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .hot-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .hot-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #e6f7ff;
+        }
+
+        .hot-card-rank {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 22px;
+            margin-right: 8px;
+        }
+
+        .hot-card-rank.top {
+            background: #ff4d4f;
+            color: #fff;
+        }
+
+        .hot-card-title {
+            font-size: 14px;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .hot-card-meta {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 搜索结果区域 */
+        .results-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .results-count span {
+            color: #1890ff;
+            font-weight: 600;
+        }
+
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .result-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .result-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #e6f7ff;
+        }
+
+        .result-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .result-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .result-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag-kuaake {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        .tag-baidu {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .tag-xunlei {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .result-time {
+            margin-left: auto;
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+            font-size: 18px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-loading {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .modal-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #1890ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        .modal-success .resource-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .modal-success .resource-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-success .resource-link-box {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .modal-success .resource-link-label {
+            font-size: 12px;
+            color: #52c41a;
+            margin-bottom: 6px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-success .resource-link-label .tag-icon {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .modal-success .resource-link-label .tag-icon.kuaake {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        .modal-success .resource-link-label .tag-icon.baidu {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .modal-success .resource-link-label .tag-icon.xunlei {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .modal-success .resource-url {
+            font-size: 13px;
+            color: #333;
+            word-break: break-all;
+            font-family: monospace;
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #d9f7be;
+        }
+
+        .modal-success .resource-tip {
+            background: #fff7e6;
+            border: 1px solid #ffd591;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: #d46b08;
+            margin-bottom: 20px;
+        }
+
+        .modal-success .resource-tip strong {
+            color: #fa8c16;
+        }
+
+        .modal-success .action-btns {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .modal-success .action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .action-btn.primary {
+            background: #1890ff;
+            color: #fff;
+        }
+
+        .action-btn.primary:hover {
+            background: #40a9ff;
+        }
+
+        .action-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .action-btn.kuaake-btn {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .action-btn.kuaake-btn:hover {
+            background: #ff4d4f;
+            color: #fff;
+        }
+
+        .action-btn.baidu-btn {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .action-btn.baidu-btn:hover {
+            background: #1890ff;
+            color: #fff;
+        }
+
+        .action-btn.xunlei-btn {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        .action-btn.xunlei-btn:hover {
+            background: #fa8c16;
+            color: #fff;
+        }
+
+        /* 底部 */
+        .footer {
+            background: #fff;
+            border-top: 1px solid #eee;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-notice {
+            max-width: 800px;
+            margin: 0 auto 16px;
+            padding: 16px;
+            background: #f6ffed;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #52c41a;
+            line-height: 1.6;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #999;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: #1890ff;
+        }
+
+        .footer-copy {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        /* 公告弹窗 */
+        .notice-modal .modal-body {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .notice-modal .notice-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .notice-modal .notice-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .notice-modal .notice-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .search-title {
+                font-size: 22px;
+            }
+
+            .hot-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .scroll-showcase .showcase-card {
+                width: 260px;
+                height: 146px;
+            }
+
+            .scroll-showcase-alt .showcase-card {
+                width: 260px;
+            }
+
+            .action-btns {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">🔍</div>
+                <span>良君资源站</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#" onclick="showNotice()">公告</a>
+                <a href="#" onclick="showNotice()">提交需求</a>
+                <a href="#" onclick="showNotice()">网站地图</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <h1 class="search-title">搜索资源</h1>
+        <p class="search-subtitle">输入关键字，选择一条或多条线路后搜索</p>
+
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <input type="text" class="search-input" id="searchInput" placeholder="请输入关键词，如：赛博朋克2077、剑星、幻兽帕鲁..." onkeypress="if(event.key==='Enter')doSearch()">
+                <button class="search-btn" onclick="doSearch()">搜索</button>
+            </div>
+        </div>
+
+        <div class="line-section">
+            <div class="line-label">切换线路（可多选）：</div>
+            <div class="line-tags" id="lineTags">
+                <span class="line-tag active" data-line="kuaake">夸克网盘</span>
+                <span class="line-tag active" data-line="baidu">百度网盘</span>
+                <span class="line-tag active" data-line="xunlei">迅雷网盘</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 加载中状态 -->
+    <div class="loading-section" id="loadingSection">
+        <div class="spinner"></div>
+        <p>正在加载资源数据...</p>
+    </div>
+
+    <!-- ========== 横向滚动展示区域 1：热门游戏推荐 ========== -->
+    <section class="scroll-showcase" id="showcase1" style="display:none;">
+        <div class="scroll-showcase-header">
+            <div>
+                <div class="scroll-showcase-title">
+                    <span class="icon">🎮</span>
+                    <span>热门游戏推荐</span>
+                </div>
+                <div class="scroll-showcase-subtitle">精选热门单机游戏资源，点击直接获取</div>
+            </div>
+            <div class="scroll-showcase-nav">
+                <button class="scroll-nav-btn" onclick="scrollGallery('gallery1', -1)">‹</button>
+                <button class="scroll-nav-btn" onclick="scrollGallery('gallery1', 1)">›</button>
+            </div>
+        </div>
+        <div class="scroll-container-wrapper">
+            <div class="scroll-container" id="gallery1"></div>
+        </div>
+    </section>
+
+    <!-- ========== 横向滚动展示区域 2：资源快速通道 ========== -->
+    <section class="scroll-showcase-alt" id="showcase2" style="display:none;">
+        <div class="scroll-showcase-header">
+            <div>
+                <div class="scroll-showcase-title">
+                    <span class="icon">⭐</span>
+                    <span>资源快速通道</span>
+                </div>
+                <div class="scroll-showcase-subtitle">点击卡片直接查看所有下载链接</div>
+            </div>
+            <div class="scroll-showcase-nav">
+                <button class="scroll-nav-btn" onclick="scrollGallery('gallery2', -1)">‹</button>
+                <button class="scroll-nav-btn" onclick="scrollGallery('gallery2', 1)">›</button>
+            </div>
+        </div>
+        <div class="scroll-container-wrapper">
+            <div class="scroll-container" id="gallery2"></div>
+        </div>
+    </section>
+
+    <!-- 热搜区域 -->
+    <section class="hot-section" id="hotSection" style="display:none;">
+        <div class="hot-header">
+            <h2>🔥 热搜资源</h2>
+            <span class="hot-badge">实时更新</span>
+        </div>
+        <div class="hot-grid" id="hotGrid"></div>
+    </section>
+
+    <!-- 搜索结果区域 -->
+    <section class="results-section" id="resultsSection">
+        <div class="results-header">
+            <div class="results-count">找到 <span id="resultCount">0</span> 条相关资源</div>
+        </div>
+        <div class="results-list" id="resultsList"></div>
+    </section>
+
+    <!-- 资源弹窗 -->
+    <div class="modal-overlay" id="resourceModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">资源获取</span>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="modal-loading">
+                    <div class="spinner"></div>
+                    <p>资源正在获取中，请稍候...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 公告弹窗 -->
+    <div class="modal-overlay" id="noticeModal">
+        <div class="modal notice-modal">
+            <div class="modal-header">
+                <span class="modal-title">网站公告</span>
+                <button class="modal-close" onclick="closeNoticeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="notice-icon">📢</div>
+                <div class="notice-title">欢迎使用良君资源站</div>
+                <div class="notice-content">
+                    本站是网盘索引系统，所有内容均来自互联网所提供的公开引用资源，未提供资源上传、存储服务。<br><br>
+                    资源链接可能随时失效，请尽快保存。<br><br>
+                    如有问题请联系管理员。
+                </div>
+                <button class="action-btn primary" onclick="closeNoticeModal()" style="width:100%">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="footer-notice">
+            📌 声明：本站是网盘索引系统，所有内容均来自互联网所提供的公开引用资源，未提供资源上传、存储服务。
+        </div>
+        <div class="footer-links">
+            <a href="#">关于我们</a>
+            <a href="#">免责声明</a>
+            <a href="#">联系方式</a>
+            <a href="#">网站地图</a>
+        </div>
+        <div class="footer-copy">© 2026 良君资源站 so.liminger.top</div>
+    </footer>
+
+    <script>
+        // ==================== GitHub Gist 配置 ====================
+        const GIST_URL = 'https://gist.githubusercontent.com/Liang-JUN5153/ba041979d138a7f7f79d605576b90810/raw/resources.json?t=' + Date.now();
+
+        let resourcesData = {};
+
+        // 本地备份数据（Gist加载失败时兜底）
+        const backupData = {
+            "cyberpunk2077": {
+                "title": "赛博朋克2077",
+                "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/3bd292808ba9d8a337c5278acb8345d94ed769a3/header_tchinese.jpg?t=1769690377",
+                "emoji": "🤖",
+                "desc": "开放世界科幻RPG，支持光追",
+                "size": "70GB+",
+                "tag": "RPG",
+                "links": [
+                    { "type": "kuaake", "name": "夸克网盘", "url": "https://pan.quark.cn/s/f1c43ed326f8?pwd=Bi8c" },
+                    { "type": "xunlei", "name": "迅雷网盘", "url": "https://pan.xunlei.com/s/VOxinJSXj6ztrpu78NaWNjjrA1?pwd=i22h#" }
+                ]
+            },
+            "stellarblade": {
+                "title": "剑星",
+                "emoji": "⚔️",
+                "desc": "韩式动作游戏，华丽战斗系统",
+                "size": "50GB+",
+                "tag": "动作",
+                "links": [
+                    { "type": "xunlei", "name": "迅雷网盘", "url": "https://pan.xunlei.com/s/VOxinWcmClfrBWJacIEM8_UkA1?pwd=icpy#" },
+                    { "type": "kuaake", "name": "夸克网盘", "url": "https://pan.quark.cn/s/dc05625924ea?pwd=69ks" },
+                    { "type": "baidu", "name": "百度网盘", "url": "https://pan.baidu.com/s/1MdkWQI89ZNKBL4_zraAFJA?pwd=xk45" }
+                ]
+            },
+            "palworld": {
+                "title": "幻兽帕鲁",
+                "emoji": "🐉",
+                "desc": "宝可梦+生存建造，支持联机",
+                "size": "20GB+",
+                "tag": "生存",
+                "links": [
+                    { "type": "baidu", "name": "百度网盘", "url": "https://pan.baidu.com/s/1ij0LoNCi6WctP04NZfFy1w?pwd=6y9h" },
+                    { "type": "kuaake", "name": "夸克网盘", "url": "https://pan.baidu.com/s/1ij0LoNCi6WctP04NZfFy1w?pwd=6y9h" },
+                    { "type": "xunlei", "name": "迅雷网盘", "url": "https://pan.xunlei.com/s/VOxiU0JIYLKKk0SYPIbwpjBvA1?pwd=e63e#" }
+                ]
+            },
+            "gbfrelink": {
+                "title": "碧蓝幻想Relink",
+                "emoji": "🗡️",
+                "desc": "共斗ARPG，最多4人联机",
+                "size": "80GB+",
+                "tag": "ARPG",
+                "links": [
+                    { "type": "xunlei", "name": "迅雷网盘", "url": "https://pan.xunlei.com/s/VOxhuwdljRgsWVzOa-hn2EUQA1?pwd=aaam#" },
+                    { "type": "kuaake", "name": "夸克网盘", "url": "https://pan.quark.cn/s/1caad229ef6f?pwd=x97A" }
+                ]
+            },
+            "acblackflag": {
+                "title": "刺客信条黑旗重制版",
+                "emoji": "🏴‍☠️",
+                "desc": "经典海战重制，4K画质升级",
+                "size": "60GB+",
+                "tag": "动作",
+                "links": [
+                    { "type": "xunlei", "name": "迅雷网盘", "url": "https://pan.xunlei.com/s/VOxZe7n9TPLBXe5CjYeXFbCIA1?pwd=psck#" },
+                    { "type": "baidu", "name": "百度网盘", "url": "https://pan.baidu.com/s/1iJqn0Nvf6WJhDQ2xLbaz0w?pwd=fwq6" }
+                ]
+            }
+        };
+
+        // 从 Gist 加载资源数据
+        async function loadResources() {
+            try {
+                const res = await fetch(GIST_URL + '?t=' + Date.now(), {
+                    cache: 'no-cache'
+                });
+
+                if (!res.ok) throw new Error('Gist加载失败');
+
+                const data = await res.json();
+                resourcesData = data;
+                console.log('✅ Gist资源加载成功:', Object.keys(resourcesData).length, '个游戏');
+
+            } catch (err) {
+                console.warn('⚠️ Gist加载失败，使用本地备份:', err.message);
+                resourcesData = backupData;
+            }
+
+            // 隐藏加载，显示内容
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('showcase1').style.display = 'block';
+            document.getElementById('showcase2').style.display = 'block';
+            document.getElementById('hotSection').style.display = 'block';
+
+            // 初始化页面
+            initShowcase1();
+            initShowcase2();
+            initHot();
+        }
+
+        // 初始化横向滚动区1（海报卡片）
+        function initShowcase1() {
+            const container = document.getElementById('gallery1');
+            const keys = Object.keys(resourcesData);
+
+            container.innerHTML = keys.map(key => {
+                const item = resourcesData[key];
+                const cover = item.cover || '';
+                const bgStyle = cover ? `background-image: url('${cover}'); background-size: cover; background-position: center;` : '';
+
+                return `
+                    <div class="showcase-card" onclick="openResourceMulti('${item.title}', '${key}')">
+                        <div class="showcase-card-img" style="${bgStyle}">
+                            ${!cover ? `<span class="emoji">${item.emoji}</span>` : ''}
+                            <div class="card-overlay">
+                                <div class="card-title">${item.title}</div>
+                                <div class="card-meta">
+                                    <span class="card-tag">${item.tag}</span>
+                                    <span class="card-size">${item.size}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 初始化横向滚动区2（横版卡片）
+        function initShowcase2() {
+            const container = document.getElementById('gallery2');
+            const keys = Object.keys(resourcesData);
+
+            container.innerHTML = keys.map(key => {
+                const item = resourcesData[key];
+                return `
+                    <div class="showcase-card" onclick="openResourceMulti('${item.title}', '${key}')">
+                        <div class="showcase-card-img">
+                            <span class="emoji">${item.emoji}</span>
+                        </div>
+                        <div class="showcase-card-info">
+                            <div class="showcase-card-title">${item.title}</div>
+                            <div class="showcase-card-desc">${item.desc}</div>
+                            <div class="showcase-card-meta">
+                                <span class="showcase-card-tag tag-game">${item.tag}</span>
+                                <span>${item.size}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 初始化热搜
+        function initHot() {
+            const grid = document.getElementById('hotGrid');
+            const keys = Object.keys(resourcesData);
+
+            grid.innerHTML = keys.map((key, idx) => {
+                const item = resourcesData[key];
+                return `
+                    <div class="hot-card" onclick="openResourceMulti('${item.title}', '${key}')">
+                        <span class="hot-card-rank ${idx < 3 ? 'top' : ''}">${idx + 1}</span>
+                        <span class="hot-card-title">${item.title} ${item.desc}</span>
+                        <div class="hot-card-meta">
+                            <span>${item.tag}</span>
+                            <span>${item.size}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 横向滚动控制
+        function scrollGallery(galleryId, direction) {
+            const container = document.getElementById(galleryId);
+            const scrollAmount = direction * 400;
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+
+        // 打开多链接资源弹窗
+        function openResourceMulti(title, resourceKey) {
+            const modal = document.getElementById('resourceModal');
+            const body = document.getElementById('modalBody');
+            modal.classList.add('active');
+
+            body.innerHTML = `
+                <div class="modal-loading">
+                    <div class="spinner"></div>
+                    <p>正在连接网盘服务器...</p>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const resource = resourcesData[resourceKey];
+                if (!resource) {
+                    body.innerHTML = `
+                        <div style="text-align:center;padding:40px;color:#999;">
+                            <p style="font-size:48px;margin-bottom:16px;">😕</p>
+                            <p>资源信息加载失败，请稍后重试</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const linksHtml = resource.links.map(link => `
+                    <div class="resource-link-box">
+                        <div class="resource-link-label">
+                            <span class="tag-icon ${link.type}">${link.name}</span>
+                            <span>点击下方按钮访问</span>
+                        </div>
+                        <div class="resource-url">${link.url}</div>
+                    </div>
+                `).join('');
+
+                const actionBtns = resource.links.map(link => {
+                    let btnClass = 'secondary';
+                    if (link.type === 'kuaake') btnClass = 'kuaake-btn';
+                    else if (link.type === 'baidu') btnClass = 'baidu-btn';
+                    else if (link.type === 'xunlei') btnClass = 'xunlei-btn';
+                    return `<a href="${link.url}" target="_blank" class="action-btn ${btnClass}">打开${link.name}</a>`;
+                }).join('');
+
+                body.innerHTML = `
+                    <div class="modal-success">
+                        <div class="resource-title">${resource.title}</div>
+                        <div class="resource-links">
+                            ${linksHtml}
+                        </div>
+                        <div class="resource-tip">
+                            ⏰ <strong>资源链接可能随时失效，请尽快保存！</strong><br>
+                            如果某个链接无法访问，请尝试其他网盘链接
+                        </div>
+                        <div class="action-btns">
+                            ${actionBtns}
+                            <button class="action-btn secondary" onclick="copyAllUrls('${resourceKey}')">复制全部链接</button>
+                        </div>
+                    </div>
+                `;
+            }, 800);
+        }
+
+        // 复制全部链接
+        function copyAllUrls(resourceKey) {
+            const resource = resourcesData[resourceKey];
+            if (!resource) return;
+
+            const text = resource.links.map(l => `${l.name}: ${l.url}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert('全部链接已复制到剪贴板');
+            }).catch(() => {
+                const input = document.createElement('textarea');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                alert('全部链接已复制到剪贴板');
+            });
+        }
+
+        // 线路切换
+        document.getElementById('lineTags').addEventListener('click', function(e) {
+            if (e.target.classList.contains('line-tag')) {
+                e.target.classList.toggle('active');
+            }
+        });
+
+        // 搜索功能
+        function doSearch() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (!keyword) {
+                alert('请输入搜索关键词');
+                return;
+            }
+
+            const activeLines = Array.from(document.querySelectorAll('.line-tag.active')).map(t => t.dataset.line);
+            if (activeLines.length === 0) {
+                alert('请至少选择一条搜索线路');
+                return;
+            }
+
+            // 显示结果区域，隐藏其他
+            document.getElementById('hotSection').style.display = 'none';
+            document.querySelector('.scroll-showcase').style.display = 'none';
+            document.querySelector('.scroll-showcase-alt').style.display = 'none';
+            document.getElementById('resultsSection').classList.add('active');
+
+            const list = document.getElementById('resultsList');
+            list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;"><div class="spinner" style="width:40px;height:40px;border:3px solid #f0f0f0;border-top-color:#1890ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div><p>正在搜索资源...</p></div>';
+
+            setTimeout(() => {
+                let results = [];
+                const keywordLower = keyword.toLowerCase();
+
+                for (const key in resourcesData) {
+                    const item = resourcesData[key];
+                    if (item.title.toLowerCase().includes(keywordLower) || 
+                        item.desc.toLowerCase().includes(keywordLower) ||
+                        item.tag.toLowerCase().includes(keywordLower)) {
+
+                        const filteredLinks = item.links.filter(l => activeLines.includes(l.type));
+                        if (filteredLinks.length > 0) {
+                            results.push({
+                                title: item.title,
+                                desc: item.desc,
+                                tag: filteredLinks[0].type,
+                                tagName: filteredLinks[0].name,
+                                time: '2026-07-17',
+                                url: filteredLinks[0].url,
+                                key: key
+                            });
+                        }
+                    }
+                }
+
+                document.getElementById('resultCount').textContent = results.length;
+
+                if (results.length === 0) {
+                    list.innerHTML = '<div style="text-align:center;padding:60px;color:#999;"><p style="font-size:48px;margin-bottom:16px;">😕</p><p>未找到相关资源，请尝试其他关键词或线路</p></div>';
+                    return;
+                }
+
+                list.innerHTML = results.map(item => `
+                    <div class="result-item" onclick="openResourceMulti('${item.title}', '${item.key}')">
+                        <div class="result-title">${item.title}</div>
+                        <div class="result-desc">${item.desc}</div>
+                        <div class="result-meta">
+                            <span class="result-tag tag-${item.tag}">${item.tagName}</span>
+                            <span class="result-time">更新：${item.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }, 600);
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('resourceModal').classList.remove('active');
+        }
+
+        // 显示公告
+        function showNotice() {
+            document.getElementById('noticeModal').classList.add('active');
+        }
+
+        // 关闭公告
+        function closeNoticeModal() {
+            document.getElementById('noticeModal').classList.remove('active');
+        }
+
+        // 点击遮罩关闭
+        document.getElementById('resourceModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        document.getElementById('noticeModal').addEventListener('click', function(e) {
+            if (e.target === this) closeNoticeModal();
+        });
+
+        // 页面加载时自动读取 Gist
+        loadResources();
+    </script>
+</body>
+</html>

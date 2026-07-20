@@ -118,7 +118,6 @@
             position: absolute; top: 8px; right: 8px; background: #ff4d4f; color: #fff;
             font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; z-index: 2;
         }
-        /* 卡片覆盖层样式 - 新增 */
         .card-overlay {
             position: absolute; bottom: 0; left: 0; right: 0;
             background: linear-gradient(transparent, rgba(0,0,0,0.8));
@@ -330,7 +329,6 @@
             .action-btn { width: 100%; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <header class="header">
@@ -473,7 +471,8 @@
 
     <script>
         // ==================== GitHub Gist 配置 ====================
-        const GIST_URL = 'https://gist.githubusercontent.com/Liang-JUN5153/ba041979d138a7f7f79d605576b90810/raw/5a33cb3340c4208e39483e018ee0e5391ab4fab9/gistfile1.txt';
+        // 更新为你的新 Gist URL
+        const GIST_URL = 'https://gist.githubusercontent.com/Liang-JUN5153/ba041979d138a7f7f79d605576b90810/raw/15ff9cccaa1bf9362dd4bc8d8225ef42f0f0f0fa/resources.json';
 
         let resourcesData = {};
 
@@ -538,7 +537,7 @@
             }
         };
 
-        // 从 Gist 加载资源数据 - 修复版
+        // 从 Gist 加载资源数据 - 兼容转义JSON格式
         async function loadResources() {
             try {
                 const res = await fetch(GIST_URL + '?t=' + Date.now(), {
@@ -548,42 +547,52 @@
 
                 if (!res.ok) throw new Error('Gist加载失败，状态码:' + res.status);
 
-                const text = await res.text();
-                console.log('原始响应长度:', text.length);
-                console.log('原始响应前200字符:', text.substring(0, 200));
+                const rawText = await res.text();
+                console.log('原始响应长度:', rawText.length);
+                console.log('原始响应前300字符:', rawText.substring(0, 300));
 
-                // 清理可能的Markdown代码块包裹
-                let cleanText = text.trim();
+                // ===== 核心修复：处理转义的JSON =====
+                let cleanText = rawText.trim();
+
+                // 1. 去掉可能的 Markdown 代码块
                 if (cleanText.startsWith('```')) {
-                    // 去掉开头的 ```json 或 ```
                     cleanText = cleanText.replace(/^```[a-zA-Z]*\n?/, '');
-                    // 去掉结尾的 ```
                     cleanText = cleanText.replace(/\n?```$/, '');
                     cleanText = cleanText.trim();
                 }
 
-                // 尝试解析JSON
+                // 2. 反转义：把 \[ 变回 [，\] 变回 ]，\_ 变回 _
+                cleanText = cleanText
+                    .replace(/\\\[/g, '[')
+                    .replace(/\\\]/g, ']')
+                    .replace(/\\_/g, '_');
+
+                console.log('清理后前300字符:', cleanText.substring(0, 300));
+
+                // 3. 解析JSON
                 let data;
                 try {
                     data = JSON.parse(cleanText);
                 } catch (parseErr) {
-                    console.warn('直接解析失败，尝试提取JSON...');
-                    // 尝试从文本中提取JSON对象
-                    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        data = JSON.parse(jsonMatch[0]);
+                    console.warn('直接解析失败，尝试提取JSON对象...');
+                    // 尝试从文本中提取最外层的大括号包裹内容
+                    const firstBrace = cleanText.indexOf('{');
+                    const lastBrace = cleanText.lastIndexOf('}');
+                    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                        const extracted = cleanText.substring(firstBrace, lastBrace + 1);
+                        data = JSON.parse(extracted);
                     } else {
                         throw parseErr;
                     }
                 }
 
-                // 验证数据格式
+                // 验证数据
                 if (typeof data !== 'object' || data === null || Object.keys(data).length === 0) {
                     throw new Error('Gist数据格式无效或为空');
                 }
 
                 resourcesData = data;
-                console.log('✅ Gist资源加载成功:', Object.keys(resourcesData).length, '个游戏');
+                console.log('✅ Gist资源加载成功:', Object.keys(resourcesData).length, '个资源');
 
             } catch (err) {
                 console.warn('⚠️ Gist加载失败，使用本地备份:', err.message);
@@ -602,7 +611,7 @@
             initHot();
         }
 
-        // 初始化横向滚动区1（海报卡片）- 修复版
+        // 初始化横向滚动区1（海报卡片）
         function initShowcase1() {
             const container = document.getElementById('gallery1');
             const keys = Object.keys(resourcesData);
